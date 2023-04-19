@@ -1,6 +1,9 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 
 export const client = new ApolloClient({
-  uri: 'https://api-sa-east-1.hygraph.com/v2/cle7xg2351f1a01tfgsrh7ptf/master',
+  uri: process.env.NEXT_PUBLIC_URL_API,
   cache: new InMemoryCache(),
+  headers: {
+    Authorization: `Bearer ${process.env.NEXT_PUBLIC_SECRET_KEY_API}`,
+  },
 })
