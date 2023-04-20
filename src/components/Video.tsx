@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { useGetLessonBySlugQuery } from '@/graphql/generated'
 import '@vime/core/themes/default.css'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -19,42 +19,14 @@ interface VideoProps {
   lessonSlug: string
 }
 
-const GET_LESSON_BY_SLUG = gql`
-  query GetLessonBySlug($slug: String) {
-    lesson(where: { slug: $slug }) {
-      title
-      description
-      videoId
-      teacher {
-        bio
-        name
-        avatarURL
-      }
-    }
-  }
-`
-
-interface GetLessonBySlugProps {
-  lesson: {
-    title: string
-    videoId: string
-    description: string
-    teacher: {
-      bio: string
-      avatarURL: string
-      name: string
-    }
-  }
-}
-
 export function Video({ lessonSlug }: VideoProps) {
-  const { data } = useQuery<GetLessonBySlugProps>(GET_LESSON_BY_SLUG, {
+  const { data } = useGetLessonBySlugQuery({
     variables: {
       slug: lessonSlug,
     },
   })
 
-  if (!data) {
+  if (!data || !data.lesson) {
     return <div className="flex-1">Carregando ...</div>
   }
 
@@ -83,14 +55,16 @@ export function Video({ lessonSlug }: VideoProps) {
                 className="h-16 w-16 rounded-full border-2 border-blue-500"
               />
 
-              <div className="leading-relaxed">
-                <strong className="font-bold text-2xl block">
-                  {data.lesson.teacher.name}
-                </strong>
-                <span className="text-gray-200 text-sm block">
-                  {data.lesson.teacher.bio}
-                </span>
-              </div>
+              {data.lesson.teacher && (
+                <div className="leading-relaxed">
+                  <strong className="font-bold text-2xl block">
+                    {data.lesson.teacher.name}
+                  </strong>
+                  <span className="text-gray-200 text-sm block">
+                    {data.lesson.teacher.bio}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
